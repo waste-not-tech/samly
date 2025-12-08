@@ -365,7 +365,7 @@ in `Samly.Subject.in_response_to` field. It is the responsibility of the consumi
     > will reject (`access_denied`) IdP responses using `SHA1`.
 +   `esaml` provides additional checks such as trusted certificate verification, recipient verification among others.
 +   By default, `Samly` signs the SAML requests it sends to the Identity Provider. It also
-    expects the SAML reqsponses to be signed (both assertion and envelopes). If your IdP is
+    expects the SAML responses to be signed (both assertion and envelopes). If your IdP is
     not configured to sign, you will have to explicitly turn them off in the configuration.
     It is highly recommended to turn signing on in production deployments.
 +   Encrypted Assertions are supported in `Samly`. There are no explicit config settings for this. Decryption happens automatically when encrypted assertions are detected in the SAML response.
