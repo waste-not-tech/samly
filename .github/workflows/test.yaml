@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    env:
+      MIX_ENV: test
+    strategy:
+      matrix:
+        otp: ['26.2.5', '27.3.4', '28.3.1']
+        elixir: ['1.18.4', '1.19.1']
+        exclude:
+          - otp: '26.2.5'
+            elixir: '1.19.1'
+          - otp: '28.3.1'
+            elixir: '1.18.4'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: setup-beam
+        name: Setup beam
+        uses: erlef/setup-beam@main
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+          version-type: strict
+
+      - name: Cache Mix
+        uses: actions/cache@v5
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ steps.setup-beam.outputs.otp-version }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ steps.setup-beam.outputs.otp-version }}-
+
+      - name: Get deps
+        run: mix deps.get --check-locked
+
+      - name: Check format
+        run: mix format --check-formatted
+
+      - name: Check unused
+        run: mix deps.unlock --check-unused
+
+      - name: Compile
+        run: mix deps.compile
+
+      - name: Check compile warnings
+        run: mix compile --no-optional-deps --warnings-as-errors
+
+      - name: Run tests
+        run: mix test
