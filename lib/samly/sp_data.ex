@@ -87,7 +87,7 @@ defmodule Samly.SpData do
 
   defp load_cert(%SpData{certfile: certfile} = sp_data, %{} = opts_map) do
     try do
-      cert = :esaml_util.load_certificate(certfile)
+      cert = :esaml_lite_util.load_certificate(certfile)
       %SpData{sp_data | cert: cert}
     rescue
       _error ->
@@ -106,7 +106,7 @@ defmodule Samly.SpData do
 
   defp load_key(%SpData{keyfile: keyfile} = sp_data, %{} = opts_map) do
     try do
-      key = :esaml_util.load_private_key(keyfile)
+      key = :esaml_lite_util.load_private_key(keyfile)
       %SpData{sp_data | key: key}
     rescue
       _error ->
